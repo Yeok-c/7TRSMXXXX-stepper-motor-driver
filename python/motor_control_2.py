@@ -96,7 +96,7 @@ class MotorController:
 
     def move_angle(self, angle):
         steps_to_take = round(self.full_revolution_steps/360*angle)
-        self.n_step(abs(steps_to_take))
+        self.n_step(steps_to_take)
 
     def reset(self):
         mylist = [0x01, 0x06, 0x07, 0xD0, 0x00, 0x01, 0x48, 0x87]
@@ -141,7 +141,7 @@ class MotorController:
         else:
             print("open serial port error")
 
-    def list_com_ports():
+    def list_com_ports(self):
         ports = serial.tools.list_ports.comports()
         for port, desc, hwid in sorted(ports):
             print("{}: {} [{}]".format(port, desc, hwid))
@@ -153,14 +153,15 @@ class MotorController:
 # Also physically label the IDs
 if __name__ == "__main__":
     mc = MotorController('COM5')
+    mc.list_com_ports()
 
-    while(True):
-        mc.go_position(7000)
-        # mc.reset()
-        # mc.backward_n_step(mc.full_revolution_steps)
-        time.sleep(5)
-        # mc.move_to_thousand()
-        # mc.move_angle(133)
-        time.sleep(5)
-        mc.go_position(0)
+    # while(True):
+        # mc.go_position(7000)
+        # # mc.reset()
+        # # mc.backward_n_step(mc.full_revolution_steps)
+        # time.sleep(5)
+        # # mc.move_to_thousand()
+        # # mc.move_angle(133)
+        # time.sleep(5)
+        # mc.go_position(0)
     

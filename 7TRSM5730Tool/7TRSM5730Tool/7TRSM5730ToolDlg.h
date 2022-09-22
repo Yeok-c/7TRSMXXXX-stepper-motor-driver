@@ -1,5 +1,5 @@
 
-// 7TRSM5730ToolDlg.h : 头文件
+// 7TRSM5730ToolDlg.h : Í·ÎÄ¼þ
 //
 
 #pragma once
@@ -9,14 +9,14 @@
 #define MODBUS_SCAN_TIME            WM_USER+2017
 
 
-// CMy7TRSM5730ToolDlg 对话框
+// CMy7TRSM5730ToolDlg ¶Ô»°¿ò
 class CMy7TRSM5730ToolDlg : public CDialogEx
 {
-// 构造
+// ¹¹Ôì
 public:
-	CMy7TRSM5730ToolDlg(CWnd* pParent = NULL);	// 标准构造函数
+	CMy7TRSM5730ToolDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êý
 
-// 对话框数据
+// ¶Ô»°¿òÊý¾Ý
 	enum { IDD = IDD_MY7TRSM5730TOOL_DIALOG };
 	int  mSerialId;
 	BOOL mPortState;
@@ -39,7 +39,7 @@ public:
 	CString mEdit14Str;
 	CString mEdit15Str;
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 public:
 	void ReadPortConfig();
 	void WritePortConfig();
@@ -50,11 +50,11 @@ public:
 	unsigned char SendFunction06(unsigned char mDeviceAddr,unsigned short mRegStartAddr,unsigned short mRegData, unsigned int mResTimeOut );
 	void ReadMotorState();
 	void DisResErro(unsigned char mRes);
-// 实现
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
-	// 生成的消息映射函数
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êý
 	virtual BOOL OnInitDialog();
 	afx_msg BOOL OnToolTip(UINT id,NMHDR *pNMHDR,LRESULT *pResult);
 	afx_msg void OnPaint();

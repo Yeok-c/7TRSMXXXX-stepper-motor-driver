@@ -180,9 +180,10 @@ if __name__ == "__main__":
 
     while(True):
         # mc.go_position(70)
+        time.sleep(5)
         mc.move_angle(-133)
         # mc.backward_n_step(mc.full_revolution_steps)
-        time.sleep(5)
+        time.sleep(45)
         mc.move_angle(133)
-        time.sleep(5)
+        time.sleep(45)
     
