@@ -1,40 +1,7 @@
-#include "7TRSM.h"
-#include "Modbus.h"
-#include "string.h"
-#include <iostream>
-
-#include "serialib.h"
-#include <stdio.h>
-#include <windows.h>
-
-unsigned char n_steps(int mDeviceAddr, long steps);
-unsigned char change_addr(int mDeviceAddr, unsigned char mRegData);
-unsigned char change_accel_param(int mDeviceAddr, float mRegDataFloat);
-unsigned char change_accel_steps(int mDeviceAddr, int mRegData32);
-unsigned char change_microstep(int mDeviceAddr, unsigned short mRegData);
-// unsigned char change_switch_offset(int mDeviceAddr, int mRegData32);
-unsigned char change_period_initial(int mDeviceAddr, unsigned short mRegData);
-unsigned char change_period_constant(int mDeviceAddr, unsigned short mRegData);
-unsigned char flash_parameters(int mDeviceAddr);
-
-unsigned char SendFunction16(
-	unsigned char mDeviceAddr,
-	unsigned short mRegStartAddr,
-	unsigned short mRegNumber,
-	CModBusCmd16 *pModBusCmd16,
-	unsigned int mResTimeOut 
-	);
-
-unsigned char SendFunction06(
-	unsigned char mDeviceAddr,
-	unsigned short mRegStartAddr,
-	unsigned short mRegData,
-	unsigned int mResTimeOut );
-
-// unsigned short ModRtuCrc(unsigned char buf[], int len);
+#include "TRSM.h"
 
 //=========================================================================
-unsigned char n_steps(int mDeviceAddr, long steps){
+unsigned char TRSM::n_steps(int mDeviceAddr, long steps){
 	CModBusCmd16 mCModBusCmd16;
 	unsigned short mRegStart;
 	unsigned char  mRes;
@@ -55,20 +22,22 @@ unsigned char n_steps(int mDeviceAddr, long steps){
 	mCModBusCmd16.mRegData[1] = (unsigned char)(mRegData >> 16);
 	mCModBusCmd16.mRegData[2] = (unsigned char)(mRegData >> 8);
 	mCModBusCmd16.mRegData[3] = (unsigned char)(mRegData >> 0);
+	printf("\nn_steps: %d steps", steps);
 	mRes = SendFunction16(mDeviceAddr,mRegStart,2,&mCModBusCmd16,1000);
 	return mRes;
 }
 
-unsigned char change_addr(int mDeviceAddr, unsigned char mRegData){
+unsigned char TRSM::change_addr(int mDeviceAddr, unsigned char mRegData){
     unsigned char  mRes;	
 	unsigned short mRegAddr;
 	unsigned short  mRegStart;
 	mRegAddr = 3000;
+	printf("\nchange_addr: old=%u, new=%d", mDeviceAddr, mRegData);
 	mRes = SendFunction06(mDeviceAddr,mRegAddr,mRegData,1000);
 	return mRes;
 }
 
-unsigned char change_accel_param(int mDeviceAddr, float mRegDataFloat){
+unsigned char TRSM::change_accel_param(int mDeviceAddr, float mRegDataFloat){
 	CModBusCmd16 mCModBusCmd16;
 	unsigned short mRegStart;
 	unsigned char  mRes;
@@ -78,11 +47,14 @@ unsigned char change_accel_param(int mDeviceAddr, float mRegDataFloat){
 	mCModBusCmd16.mRegData[1] = (unsigned char)((*(unsigned int*)(&mRegDataFloat)) >> 16);
 	mCModBusCmd16.mRegData[2] = (unsigned char)((*(unsigned int*)(&mRegDataFloat)) >> 8);
 	mCModBusCmd16.mRegData[3] = (unsigned char)((*(unsigned int*)(&mRegDataFloat)) >> 0);
+	
+	printf("\nchange_accel_param: %05f", mRegDataFloat);
 	mRes = SendFunction16(mDeviceAddr,mRegStart,2,&mCModBusCmd16,3000);
+	
 	return mRes;
 }
 
-unsigned char change_accel_steps(int mDeviceAddr, int mRegData32){
+unsigned char TRSM::change_accel_steps(int mDeviceAddr, int mRegData32){
 	CModBusCmd16 mCModBusCmd16;
 	unsigned short mRegStart;
 	unsigned char  mRes;
@@ -92,15 +64,17 @@ unsigned char change_accel_steps(int mDeviceAddr, int mRegData32){
 	mCModBusCmd16.mRegData[1] = (unsigned char)(mRegData32 >> 16);
 	mCModBusCmd16.mRegData[2] = (unsigned char)(mRegData32 >> 8);
 	mCModBusCmd16.mRegData[3] = (unsigned char)(mRegData32 >> 0);
+	printf("\nchange_accel_steps: %u", mRegData32);
 	mRes = SendFunction16(mDeviceAddr,mRegStart,2,&mCModBusCmd16,3000);	
 	return mRes;
 }
 
-unsigned char change_microstep(int mDeviceAddr, unsigned short mRegData){
+unsigned char TRSM::change_microstep(int mDeviceAddr, unsigned short mRegData){
     unsigned char  mRes;	
 	unsigned short mRegAddr;
 	unsigned short  mRegStart;
 	mRegAddr = 3001;
+	printf("\nchange_microstep: %u", mRegData);
 	if ((mRegData == 1) || (mRegData == 2) || (mRegData == 4)|| (mRegData == 8)|| (mRegData == 16)|| (mRegData == 32)){
 		mRes = SendFunction06(mDeviceAddr,mRegAddr,mRegData,1000);
 	}
@@ -126,64 +100,45 @@ unsigned char change_microstep(int mDeviceAddr, unsigned short mRegData){
 // 	return mRes;
 // }
 
-unsigned char change_period_initial(int mDeviceAddr, unsigned short mRegData){
+unsigned char TRSM::change_period_initial(int mDeviceAddr, unsigned short mRegData){
     unsigned char  mRes;	
 	unsigned short mRegAddr;
 	unsigned short  mRegStart;
 	mRegAddr = 3008;
+	printf("\nchange_period_initial: %u", mRegData);
 	mRes = SendFunction06(mDeviceAddr,mRegAddr,mRegData,3000);
 	return mRes;
 }
 
-unsigned char change_period_constant(int mDeviceAddr, unsigned short mRegData){
+unsigned char TRSM::change_period_constant(int mDeviceAddr, unsigned short mRegData){
     unsigned char  mRes;	
 	unsigned short mRegAddr;
 	unsigned short  mRegStart;
 	mRegAddr = 3009;
+	printf("\nchange_period_constant: %u", mRegData);
 	mRes = SendFunction06(mDeviceAddr,mRegAddr,mRegData,6000);
 	return mRes;
 }
 
-unsigned char flash_parameters(int mDeviceAddr){
+unsigned char TRSM::flash_parameters(int mDeviceAddr){
 	CModBusCmd16 mCModBusCmd16;
     unsigned char  mRes;	
 	unsigned short mRegAddr,mRegData;
 	unsigned short  mRegStart;
 	mRegAddr = 4002;
 	mRegData = 0;
+	printf("\nflashing parameters");
 	mRes = SendFunction06(mDeviceAddr,mRegAddr,mRegData,3000);
 	return mRes;
 }
 
-// unsigned short ModRtuCrc(unsigned char buf[], int len){
-//   unsigned short crc = 0xFFFF;
-// 	int pos,i;
- 
-//   for (pos = 0; pos < len; pos++) 
-// 	{
-//     crc ^=buf[pos];          // XOR byte into least sig. byte of crc 
-//     for (i = 8; i != 0; i--) 
-// 		{    // Loop over each bit
-//         if ((crc & 0x0001) != 0) 
-// 			  {      // If the LSB is set
-//            crc >>= 1;                    // Shift right and XOR 0xA001
-//            crc ^= 0xA001;
-//         }
-//         else                            // Else LSB is not set
-//            crc >>= 1;                    // Just shift right
-//     }//for (int i = 8; i != 0; i--) 
-//   }//for (int pos = 0; pos < len; pos++) 
-//   // Note, this number has low and high bytes swapped, so use it accordingly (or swap bytes)
-//   return crc;  
-// }
-
-void append(char* s, char c) {
+void TRSM::append(char* s, char c) {
         int len = strlen(s);
         s[len] = c;
         s[len+1] = '\0';
 }
 
-unsigned char SendFunction16(
+unsigned char TRSM::SendFunction16(
 	unsigned char mDeviceAddr,
 	unsigned short mRegStartAddr,
 	unsigned short mRegNumber,
@@ -220,17 +175,18 @@ unsigned char SendFunction16(
 	pModBusCmd16->mRegData[mDataLable++] = pModBusCmd16->CrcHight;
 	pModBusCmd16->mTxLength          = 9 + pModBusCmd16->mByteNumber;
 	pCharData = (unsigned char*)(pModBusCmd16);
-
+	
+	printf("\nSendFunction16:");
     for(unsigned char i=0;i< pModBusCmd16->mTxLength;i++){
 		char mStrHex[3];
-		sprintf(mStrHex, "%02x",*pCharData++); //reformat as hex
+		printf("%02x",*pCharData++); //reformat as hex
 		// sprintf(mStrHex, " %02x",*pCharData++); //reformat as hex
-		strcat(mStr, mStrHex);
+		// strcat(mStr, mStrHex);
 	}
 	return 1;
 }
 
-unsigned char SendFunction06(
+unsigned char TRSM::SendFunction06(
 	unsigned char mDeviceAddr,
 	unsigned short mRegStartAddr,
 	unsigned short mRegData,
@@ -256,12 +212,13 @@ unsigned char SendFunction06(
 
 	pCharData = (unsigned char*)(&mModBusCmd06);
 
+	printf("\nSendFunction06:");
     for(unsigned char i=0;i< 8;i++)
 	{
 		char mStrHex[3];
-		sprintf(mStrHex, "%02x",*pCharData++); //reformat as hex
+		printf("%02x",*pCharData++); //reformat as hex
 		// sprintf(mStrHex, " %02x",*pCharData++); //reformat as hex
-		strcat(mStr, mStrHex);	
+		// strcat(mStr, mStrHex);	
 	}
 	return 1;
 }
